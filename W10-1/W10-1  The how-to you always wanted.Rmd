@@ -1,0 +1,101 @@
+---
+title: "W10-1: The how-to you always wanted"
+author: "Christian Hoefs, Jonas Hagge & Stefan Pinkert"
+date: "February 3rd, 2016"
+output: html_document
+---
+This is a tutorial on how to write a function that visualizes a spatial point vector attribute over a contrast stretched raster image, containing a discrete legend for the attribute values and a continuous legend for the raster image.  
+
+First we´ll do some data preparation
+
+1. Require the neccessary packages
+
+```{r , warning=FALSE, message=FALSE }
+
+library(sp)
+library(raster)
+library(rgdal)
+library(ggplot2)
+library(RColorBrewer)
+library(classInt)
+
+```
+
+2. Define the in- and output paths
+
+```{r , warning=FALSE, message=FALSE }
+
+inpath_dm <- "E:/Dropbox/Dropbox/Dropbox/Data_managment/data/input/"
+output_dm <- "E:/Dropbox/Dropbox/Dropbox/Data_managment/data/output/"
+```
+
+3. Read the required raster data (Band 3) of the Landsat 8 scene from Fogo island
+
+```{r , warning=FALSE, message=FALSE }
+b3 <- raster(file.path(inpath_dm,"LC82100502014328LGN00_B3.tif"))
+plot(b3)
+
+```
+
+4. Read the vector data containing field study sites from 2014 and transform the projection from Landsat data
+
+```{r , warning=FALSE, message=FALSE }
+
+fsd2014 <- readOGR(dsn=file.path(inpath_dm), layer="data_2014_subset1")
+fsd2014 <- spTransform(fsd2014,crs(b3))
+plot(fsd2014)
+
+```
+
+5. Plot the study sites with number of species on a greyscale sattelite image of Landsat 8 Band 3
+
+```{r , warning=FALSE, message=FALSE }
+
+##plotting band 3 as greyscale sattelite image
+
+plot(b3,col=grey((0:255)/255),main="Fogo Island - study sites with number of natural species per plot")
+
+## plotting the study sites on the image 
+
+plot(fsd2014,add=TRUE, pch=3)
+
+## creating a color palette for different species numbers within the study sites with five intervals 
+
+pal.col<-colorRampPalette(c("red","yellow","springgreen","royalblue"))(5)
+fsd2014$NAT <- as.numeric(fsd2014$NAT)
+intervals<-classIntervals(fsd2014$NAT, n=5, style="equal")
+col<-findColours(intervals,pal.col)
+
+plot(fsd2014,col=col,add=TRUE, pch=19)
+
+## creating a legend containing the number of species with the colors used in the map before
+
+legend("topright", legend=row.names(attr(col,"table")), fill=attr(col,"palette"), 
+       border=attr(col,"palette"), bty="L")
+
+```
+
+Now we put it together in the function:
+
+```{r , warning=FALSE, message=FALSE }
+
+r.bg <- raster(file.path(inpath_dm,"LC82100502014328LGN00_B3.tif"))
+points <- readOGR(dsn=file.path(inpath_dm), layer="data_2014_subset1")
+
+plot.vector.attr<-function(r.bg,points,val,title=main){
+  pal.col<-colorRampPalette(c("red","yellow","springgreen","royalblue"))(5)
+  intervals<-classIntervals(val, n=5, style="equal")
+  col<-findColours(intervals,pal.col)
+  
+  points <- spTransform(points,crs(r.bg))
+  plot(r.bg,col=grey((0:255)/255),main=title)
+  plot(points,col=col,add=TRUE, pch=".")
+  legend("topright", legend=row.names(attr(col,"table")), fill=attr(col,"palette"), 
+         border=attr(col,"palette"), bty="L")
+  
+}
+
+plot.vector.attr(r.bg=r.bg,points=points,val=fsd2014@data$NAT,title="Fogo Island - study sites with number of natural species per plot")
+
+```
+

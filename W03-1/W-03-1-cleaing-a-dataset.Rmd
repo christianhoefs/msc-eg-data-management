@@ -1,0 +1,128 @@
+---
+title: "W03-01 Cleaning a dataset"
+output: html_document
+author: "Christian Höfs, Stefan Pinkert & Jonas Hagge"
+date: "22.Oktober 2015"
+
+---
+
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results="hide"}
+
+
+inpath_dm <- "E:/Dropbox/Dropbox/Dropbox/Data_managment/data/input/"
+output_dm <- "E:/Dropbox/Dropbox/Dropbox/Data_managment/data/output/"
+```
+
+
+
+```{r}
+#1. Read the Ebola chronology from 1976 to 2014 into a data frame
+
+ec <- read.csv(paste0(inpath_dm, "ebola_chronology.csv"), sep = ";", header=TRUE)
+
+
+#2. Rename the column headers to meaningful names
+
+colnames(ec) <- c("year","country","subtype","infected", "death", "situation" )
+
+
+
+#3. Remove the following rows:
+
+#a. empty rows (tip: look for blank cells)
+
+ec <- ec[!ec$year == "",]
+
+#b. the row with information about "March 2014-Present" since this will be provided by the second data set
+
+ec <- ec[!ec$year == "March 2014-Present",]
+
+#4. Clear the column with information about the year. It is sufficient to define an outbreak just by the last update
+
+ec$year <- as.character(ec$year)
+ec$year[ec$year == "Nov 08"] = "2008"
+ec$year <- substring( ec$year, 
+  regexpr(pattern="[[:digit:]]", ec$year),  
+  regexpr(pattern="[[:digit:]]", ec$year) + 3)
+
+
+#5. Clean the column on total/relative death
+
+#a. separate total from relative death and store the latter in a new column (tip: you can not do this in one step but you have to copy the relative death to the new column first before removing them in the original column)
+
+ec$death <- as.character(ec$death)
+ec$absolute_death <- substring(ec$death,1,regexpr(" ", ec$death) -1)
+
+ec$relative_death <- substring(ec$death,regexpr(" ", ec$death) +1, nchar(ec$death))
+
+ec$death <- NULL
+
+
+#b. clean both columns so the cells will only contain digits 
+
+ec$absolute_death <- gsub ("[*]", "", ec$absolute_death)
+
+ec$absolute_death[is.na(ec$absolute_death)] <- 0
+
+ec$relative_death <- gsub ("[(]", "", ec$relative_death)
+ec$relative_death <- gsub ("[)]", "", ec$relative_death)
+ec$relative_death <- gsub ("[%]", "", ec$relative_death)
+
+
+#c. convert both columns to numeric
+
+ec$relative_death <- as.numeric(ec$relative_death)
+
+ec$absolute_death <- as.numeric(ec$absolute_death)
+
+#6. Clean column with information on infected persons and convert it to numeric
+
+ec$infected <- gsub ("[[punct]]", "", ec$infected)
+ec$infected <- gsub ("[[alpha]]", "", ec$infected)
+
+
+ec$infected <- as.numeric(ec$infected)
+
+ec$infected[is.na(ec$infected)] <- 0
+
+#7. Read the Ebola information on 2014 from the second file into a data frame
+
+
+e2014 <- read.csv(paste0(inpath_dm, "ebola_outbreak_2014.csv"), sep = ";", header=TRUE)
+
+#8. Remove empty lines and the ones containing "Total" as country name in this data frame
+
+e2014 <- e2014[!is.na(e2014$Total.Deaths),]
+
+e2014 <- e2014[!e2014$Country == "Total",]
+
+
+#9. Create a new data frame holding the information of the second and having the same column number and names as the first
+
+colnames(e2014) <- c("country", "infected", "confirmed", "absolute_death", "situation")
+
+e2014n <- data.frame(year= 2014,
+                           country=e2014$country,
+                           infected=e2014$infected,
+                           subtype= "NA",
+                           situation=e2014$situation,
+                           absolute_death=e2014$absolute_death,
+                           relative_death=e2014$absolute_death/e2014$infected)
+  
+
+
+#10. Combine both data sets (chronology from 1976 - 2014 and details from 2014)
+
+ebola_gesamt<- rbind(ec, e2014n)
+
+
+
+
+#11. Save the combined data set as csv file with years in increasing order.
+
+write.csv(ebola_gesamt, paste0(output_dm, "ebola_gesamt.csv"))
+
+
+```

@@ -1,0 +1,71 @@
+---
+title: "W01-01 Getting and organizing data"
+output: html_document
+author: "Stefan Pinkert, Christian Höfs & Jonas Hagge"
+date: "22.Oktober 2015"
+
+---
+
+
+Data Download
+
+We downloaded the five datasets from the respective databases and webpages and saved them as .csv files containing the following information:
+
+
+1. gross national income (GNI) per capita converted to U.S. dollars using the World Bank Atlas method
+
+2. carbon dioxide emissions (absolute in kt)
+
+3. impact of natural disasters including information on the location, disaster groups to subtypes and helth impacts
+
+4. chronology of Ebola outbreaks since 1976 including information on the location, death rates and situation etc.
+
+5. chronology of the latest Ebola outbreaks in 2014
+
+How we organized our data:
+
+- we all the files in one input folder "E:/Documents/UNI/MSc/Data_Management/data/input/"
+- all files were saved as comma seperated values files (".csv"), beacause most data management and analysis software can cope with this data format
+- we used only lower case characters, no blank or special characters and only lowercases for seperating words to keep the data designation distinct and avoid data handling problems (case sensitivity) with different software for further procession 
+- to prepare further data cleaning and organizing the files were read in a R environment
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results="hide"}
+
+
+inpath_dm <- "E:/Dropbox/Dropbox/Dropbox/Data_managment/data/input/"
+```
+
+
+### read datasets
+```{r}
+# 1. Gross National Income
+
+gni <- read.csv(paste0(inpath_dm, "gni_wb_1960_2014.csv"), sep = ",", header=TRUE, skip=2)
+
+head(gni)
+
+# 2. CO2
+
+co2 <- read.csv(paste0(inpath_dm, "co2_wb_1960_2014.csv"), sep = ",", header=TRUE, skip=2)
+head(gni)
+
+# 3. Natural Disasters
+
+nd <- read.csv(paste0(inpath_dm, "nd_1900_2014.csv"), sep = ",", header=TRUE)
+head(nd)
+
+# 4. Ebola Chronology
+
+ec <- read.csv(paste0(inpath_dm, "ebola_chronology.csv"), sep = ";", header=TRUE)
+head(ec)
+
+# 5. Ebola outbreak 2014
+
+e2014 <- read.csv(paste0(inpath_dm, "ebola_outbreak_2014.csv"), sep = ";", header=TRUE)
+head(e2014)
+
+
+  
+```
+

@@ -1,0 +1,179 @@
+---
+title: "W07-1: Publication quality graphs"
+author: "Jonas Hagge, Stefan Pinkert & Christian Höfs"
+date: "28.Oktober 2016"
+output: html_document
+---
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results="hide"}
+
+
+inpath_dm <- "E:/Dropbox/Dropbox/Dropbox/Data_managment/data/input/"
+output_dm <- "E:/Dropbox/Dropbox/Dropbox/Data_managment/data/output/"
+```
+ Combining all four histogram plots (original, transformed values) into 
+ one visualization page and make sure that the reader knows which kind of 
+ transformation has been performed although the original data values should 
+ still be directly extractable from all four histograms (i.e. does not have 
+ transformed values on the x axis of the transformed data set).
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results="hide"}
+library("car")
+
+
+pdf(file=file.path(output_dm,"F1-Histograms_2x2.pdf"), width=12, height=12)
+wb_long <- read.csv(file.path(output_dm,"combined_worldbank_data_long.csv"))
+wb_long$log_CO2 <- log(wb_long$CO2)
+wb_long$log_GNI <- log(wb_long$GNI)
+
+# create a function for a normal distribution reference
+fit_normal<-function(x, h){
+     xfit<-seq(min(x),max(x),length=40)
+     yfit<-dnorm(xfit,mean=mean(x),sd=sd(x))
+     yfit <- yfit*diff(h$mids[1:2])*length(x)
+     lines(xfit, yfit, col="black", lwd=2)
+     }
+
+par(mfrow=c(2,2))
+# CO2 dist after transformation
+hist(wb_long$CO2, breaks=20,  main="Histograms of untransformed data", xlab=expression(CO[2]~"emisson"))
+
+# original values at the x axis
+ticks1 <-c(5,10,15)
+hist_CO2<-hist(wb_long$log_CO2, breaks=20, col="gray70", ylim=c(0,1500), 
+               xlab=expression(CO[2]~"emisson (log-transformed)"),
+               main="Histograms of transformated data", xaxt="n")
+axis(1, at = ticks1, labels = c(round(exp(5), digits=0),round(exp(10), digits=0),
+                                round(exp(15), digits=0)), las = 1)
+rug(wb_long$log_CO2, ticksize = 0.03, side = 1, lwd = 0.5)
+fit_normal(wb_long$log_CO2[-which(is.na(wb_long$CO2))], h=hist_CO2)
+
+# GNI dist after transformation
+ticks2 <-c(4,6,8,10,12)
+hist(wb_long$GNI, breaks=20, main="", xlab="Gross National Income")
+hist_GNI<-hist(wb_long$log_GNI, breaks=20, col="gray70", ylim=c(0,1200), 
+               xlab="Gross National Income (log-transformed)", main="", xaxt="n")
+axis(1, at = ticks2, labels = c(round(exp(4), digits=0),round(exp(6), digits=0),
+                                round(exp(8), digits=0),round(exp(10), digits=0),
+                                round(exp(12), digits=0)), las = 1)
+rug(wb_long$log_GNI, ticksize = 0.03, side = 1, lwd = 0.5)
+fit_normal(wb_long$log_GNI[-which(is.na(wb_long$GNI))], h=hist_GNI)
+
+dev.off()
+wb_long <- read.csv(file.path(output_dm,"combined_worldbank_data_long.csv"))
+wb_long$log_CO2 <- log(wb_long$CO2)
+wb_long$log_GNI <- log(wb_long$GNI)
+
+# create a function for a normal distribution reference
+fit_normal<-function(x, h){
+     xfit<-seq(min(x),max(x),length=40)
+     yfit<-dnorm(xfit,mean=mean(x),sd=sd(x))
+     yfit <- yfit*diff(h$mids[1:2])*length(x)
+     lines(xfit, yfit, col="black", lwd=2)
+     }
+
+par(mfrow=c(2,2))
+# CO2 dist after transformation
+hist(wb_long$CO2, breaks=20,  main="Histograms of untransformed data", xlab=expression(CO[2]~"emisson"))
+
+# original values at the x axis
+ticks1 <-c(5,10,15)
+hist_CO2<-hist(wb_long$log_CO2, breaks=20, col="gray70", ylim=c(0,1500), 
+               xlab=expression(CO[2]~"emisson (log-transformed)"),
+               main="Histograms of transformated data", xaxt="n")
+axis(1, at = ticks1, labels = c(round(exp(5), digits=0),round(exp(10), digits=0),
+                                round(exp(15), digits=0)), las = 1)
+rug(wb_long$log_CO2, ticksize = 0.03, side = 1, lwd = 0.5)
+fit_normal(wb_long$log_CO2[-which(is.na(wb_long$CO2))], h=hist_CO2)
+
+# GNI dist after transformation
+ticks2 <-c(4,6,8,10,12)
+hist(wb_long$GNI, breaks=20, main="", xlab="Gross National Income")
+hist_GNI<-hist(wb_long$log_GNI, breaks=20, col="gray70", ylim=c(0,1200), 
+               xlab="Gross National Income (log-transformed)", main="", xaxt="n")
+axis(1, at = ticks2, labels = c(round(exp(4), digits=0),round(exp(6), digits=0),
+                                round(exp(8), digits=0),round(exp(10), digits=0),
+                                round(exp(12), digits=0)), las = 1)
+rug(wb_long$log_GNI, ticksize = 0.03, side = 1, lwd = 0.5)
+fit_normal(wb_long$log_GNI[-which(is.na(wb_long$GNI))], h=hist_GNI)
+
+
+````
+
+ [2] Please combine both box whisker plots (which should be computed based on the 
+ transformed values) in one plot and also use different colors for the individual
+ variables. Make sure that the original data values are printed on the y axis.
+ The box whisker plots should not be differentiated by the regions this time 
+ (i.e. just one box for GNI, one for CO2).
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results="hide"}
+
+pdf(file=file.path(output_dm,"F2-Boxplot_CO2_and_GNI.pdf"), width=6, height=6)
+par(mfrow=c(1,1))
+boxplot_data<-as.data.frame(wb_long$log_CO2)
+boxplot_data$variable<-"CO2"
+names(boxplot_data)[1]<-"value"
+boxplot_temp<-as.data.frame(wb_long$log_GNI)
+boxplot_temp$variable<-"GNI"
+names(boxplot_temp)[1]<-"value"
+boxplot_data<-rbind(boxplot_data,boxplot_temp)
+boxplot(value~variable, data=boxplot_data, ylab=expression(CO[2]~"emisson (log-transformed)"),
+        col=c("gray90","gray60"), notch=TRUE)
+dev.off()
+par(mfrow=c(1,1))
+boxplot_data<-as.data.frame(wb_long$log_CO2)
+boxplot_data$variable<-"CO2"
+names(boxplot_data)[1]<-"value"
+boxplot_temp<-as.data.frame(wb_long$log_GNI)
+boxplot_temp$variable<-"GNI"
+names(boxplot_temp)[1]<-"value"
+boxplot_data<-rbind(boxplot_data,boxplot_temp)
+boxplot(value~variable, data=boxplot_data, ylab=expression(CO[2]~"emisson (log-transformed)"),
+        col=c("gray90","gray60"), notch=TRUE)
+```` 
+
+[3] Please make a scatter plot which shows the two transformed variables and add
+ a colored linear regression line to it. Again, make sure that the original data
+ values are printed on each of the axis. 
+ 
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results="hide"}
+
+pdf(file=file.path(output_dm,"F3-Scatter_CO2_against_GNI.pdf"), width=7, height=6)
+par(mfrow=c(1,1), mar=c(4,6,2,2))
+
+plot(log_CO2~log_GNI, data=wb_long, ylab="",
+     xlab="Gross National Income (log-transformed)",bty="L", yaxt="n",xaxt="n")
+mtext(expression(CO[2]~"emisson (log-transformed)"), side=2, cex=1, adj=0.5, line=4.5, las=0)
+# original values at the axises
+axis(2, at = ticks1, labels = c(round(exp(5), digits=0),round(exp(10), digits=0),
+                                round(exp(15), digits=0)), las = 1)
+axis(1, at = ticks2, labels = c(round(exp(4), digits=0),round(exp(6), digits=0),
+                                round(exp(8), digits=0),round(exp(10), digits=0),
+                                round(exp(12), digits=0)), las = 1)
+# single regression statistics
+regLine(lm(log_CO2~log_GNI, data=wb_long), lwd=2, col="red")
+legend("bottomright", bty="n", legend=as.expression(c(bquote(italic("P") < 0.001), bquote(italic(r)^2 == .(format(
+     round(summary(lm(log_CO2~log_GNI, data=wb_long))$r.squared, digits = 2)))))), text.col="red",  cex=1)
+dev.off()
+
+par(mfrow=c(1,1), mar=c(4,6,2,2))
+
+plot(log_CO2~log_GNI, data=wb_long, ylab="",
+     xlab="Gross National Income (log-transformed)",bty="L", yaxt="n",xaxt="n")
+mtext(expression(CO[2]~"emisson (log-transformed)"), side=2, cex=1, adj=0.5, line=4.5, las=0)
+# original values at the axises
+axis(2, at = ticks1, labels = c(round(exp(5), digits=0),round(exp(10), digits=0),
+                                round(exp(15), digits=0)), las = 1)
+axis(1, at = ticks2, labels = c(round(exp(4), digits=0),round(exp(6), digits=0),
+                                round(exp(8), digits=0),round(exp(10), digits=0),
+                                round(exp(12), digits=0)), las = 1)
+# single regression statistics
+regLine(lm(log_CO2~log_GNI, data=wb_long), lwd=2, col="red")
+legend("bottomright", bty="n", legend=as.expression(c(bquote(italic("P") < 0.001), bquote(italic(r)^2 == .(format(
+     round(summary(lm(log_CO2~log_GNI, data=wb_long))$r.squared, digits = 2)))))), text.col="red",  cex=1)
+# sample size
+nrow(unique(wb_long[,c(5,6)]))
+
+
+````
+

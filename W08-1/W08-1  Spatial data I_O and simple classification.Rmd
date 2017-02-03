@@ -1,0 +1,75 @@
+---
+title: "W08-1: Spatial data I/O and simple classification"
+author: "Christian Hoefs, Jonas Hagge & Stefan Pinkert"
+date: "February 3rd, 2017"
+output: html_document
+---
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r, warning=FALSE, message=FALSE}
+
+library(sp)
+library(raster)
+library(rgdal)
+library(ggplot2)
+
+
+inpath_dm <- "E:/Documents/UNI/MSc/Data_Management/data/input"
+output_dm <- "E:/Documents/UNI/MSc/Data_Management/data/output"
+```
+
+
+read raster data
+
+```{r, warning=FALSE, message=FALSE}
+
+b10 <- raster(file.path(inpath_dm,"LC82100502014328LGN00_B10.tif"))
+plot(b10)
+
+```
+
+read vector data of field study sites 2014
+
+```{r, warning=FALSE, message=FALSE}
+
+fsd2014 <- readOGR(inpath_dm,"data_2014_subset1")
+fsd2014 <- spTransform(fsd2014,crs(b10))
+plot(fsd2014)
+
+```
+
+
+reclassify the termal band (10) by values < 15 to NA
+```{r, warning=FALSE, message=FALSE}
+
+lava <- b10
+lava[lava < 15]<- NA
+plot(lava)
+
+```
+
+plot the lava eruption and study sites in a greyscale sattelite image of Landsat 8 Band 10
+
+```{r, warning=FALSE, message=FALSE}
+##read the neccessary bands for a true color composite:  red=band_4 at position 6, green=band_3 and blue=band_2
+files <- list.files(path=file.path(inpath_dm), pattern = glob2rx("*.tif"), full.names = TRUE)
+true_RBG<-stack(files[6],files[5],files[4]) 
+
+true_RBG<-stretch(true_RBG,minv = 0 , maxv = 255)
+
+par(oma=c(2,2,2,2))
+
+plotRGB(true_RBG, r=1, g=2, b=3, main="Lava Flow 2014 and Study Sites on Fogo Island, Cape Verdes")
+
+mtext("Lava Flow 2014 and Study Sites on Fogo Island, Cape Verdes", side =3, cex= 1, line=0.5)
+
+legend("topright", legend=c("plots 2014", "lava flow 2014"), col=c("blue", "red"), pch=c(3,15), bty="L")
+plot(lava, col="red", legend=FALSE, add=TRUE)
+plot(fsd2014,col="blue",add=TRUE, pch=3)
+
+
+
+```

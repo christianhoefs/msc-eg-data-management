@@ -1,0 +1,108 @@
+---
+title: 'W06-1: Visualizing data'
+author: "Christian Höfs, Jonas Hagge und Stefan Pinkert"
+date: "31 Januar 2017"
+output: html_document
+---
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results="hide"}
+
+
+
+inpath_dm <- "E:/Dropbox/Dropbox/Dropbox/Data_managment/data/input/"
+output_dm <- "E:/Dropbox/Dropbox/Dropbox/Data_managment/data/output/"
+```
+
+
+
+Load the merged world bank data set and merge it with the region list #####
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results="hide"}
+
+library (stats)
+library(lattice)
+wb <- read.table(file.path(inpath_dm,"combined_worldbank_data_long.csv"), header = TRUE,
+             sep = ",")
+wb <- wb[,-8] #there was a region column already
+country <- read.table(file.path(inpath_dm,"wb-db_country_classes.csv"), header = TRUE, 
+             sep = ",")
+wb_long <- merge(wb, country[,!(grepl("Economy", colnames(country)))], 
+             by.x = "Country.Code", by.y = "Code")
+wb_long$Region <- wb_long$Region.x
+wb_long$Region[wb_long$Region == ".."] <- NA
+wb_long$Region <- droplevels(wb_long$Region)
+#write.csv(file.path(output_dm, wb_long, "wb_long.csv"))
+
+
+````
+
+Make some plots 
+[1] Please extend the R script given below to create one visualization for each of 
+CO2 and GNI which allows us to get an estimate over the distribution function of the parameters.
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results="hide"}
+# CO2 dist prior to transformation
+hist(wb_long$CO2, breaks=20)
+# GNI dist prior to transformation
+hist(wb_long$GNI, breaks=20)
+
+# create a function for a normal distribution reference
+fit_normal<-function(x, h){
+     xfit<-seq(min(x),max(x),length=40)
+     yfit<-dnorm(xfit,mean=mean(x),sd=sd(x))
+     yfit <- yfit*diff(h$mids[1:2])*length(x)
+     lines(xfit, yfit, col="black", lwd=2)
+     }
+
+````
+
+
+[2] Based on the visualization results above, please extend your script to include an appropriate transformation of the CO2 and GNI values to get their distribution 
+a little bit closer to a normal distribution. Save the result as part of your 
+data frame (i.e. new columns) and visualize the results again (using the same visualization type as above). 
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results="hide"}
+
+# add log-transformed CO2 variable to the data set
+wb_long$log_CO2<-log(wb_long$CO2)
+# add log-transformed GNI variable to the data set
+wb_long$log_GNI<-log(wb_long$GNI)
+
+# CO2 dist after transformation
+
+hist_CO2<-hist(wb_long$log_CO2, breaks=20, col="gray70", ylim=c(0,1500), xlab=expression(CO[2]~"emisson (log-transformed)"),
+               main="Histogram with Normal Curve")
+
+rug(wb_long$log_CO2, ticksize = 0.03, side = 1, lwd = 0.5)
+
+
+
+fit_normal(wb_long$log_CO2[-which(is.na(wb_long$CO2))], h=hist_CO2)
+
+# GNI dist after transformation
+
+hist_GNI<-hist(wb_long$log_GNI, breaks=20, col="gray70", ylim=c(0,1200), xlab="Gross National Income (log-transformed)",
+               main="Histogram with Normal Curve")
+rug(wb_long$log_GNI, ticksize = 0.03, side = 1, lwd = 0.5)
+fit_normal(wb_long$log_GNI[-which(is.na(wb_long$GNI))], h=hist_GNI)
+````
+
+
+[3] Please extend the script to include two box whisker plots which respectively 
+summarize the CO2 and GNI value distribution for each of the world bank regions.
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results="hide"}
+boxplot(log_CO2~Region, data=wb_long, ylab=expression(CO[2]~"emisson (log-transformed)"), notch=TRUE)
+boxplot(log_GNI~Region, data=wb_long, ylab="Gross National Income (log-transformed)", notch=TRUE)
+
+````
+
+
+[4] Finally, please visualize the correlation between all CO2 and GNI values in 
+ one plot and upload your final script to your learning log. 
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results="hide"}
+summary(lm(log_CO2~log_GNI, data=wb_long))
+plot(log_CO2~log_GNI, data=wb_long, ylab=expression(CO[2]~"emisson (log-transformed)"), xlab="Gross National Income (log-transformed)")
+````
+
