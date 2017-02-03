@@ -1,0 +1,41 @@
+"","year","country","subtype","infected","situation","absolute_death","relative_death"
+"2","2012","Uganda","Sudan virus",0,"Outbreak occurred in the Luwero District. CDC assisted the Ministry of Health in the epidemiologic and diagnostic aspects of the outbreak. Testing of samples by CDC's Viral Special Pathogens Branch occurred at UVRI in Entebbe. 31 ",3,50
+"3","2012","Democratic Republic of the Congo","Bundibugyo virus",0,"Outbreak occurred in DRC’s Province Orientale. Laboratory support was provided through CDC and the Public Health Agency of Canada (PHAC)’s field laboratory in Isiro, and through the CDC/UVRI lab in Uganda. The outbreak in DRC has no epidemiologic link to the near contemporaneous Ebola outbreak in the Kibaale district of Uganda. 31 ",13,36.1
+"4","2012","Uganda","Sudan virus",0,"Outbreak occurred in the Kibaale District of Uganda. Laboratory tests of blood samples were conducted by the UVRI and the U.S. Centers for Disease Control and Prevention (CDC). 31",4,36.4
+"5","2011","Uganda","Sudan virus",1,"The Ugandan Ministry of Health informed the public that a patient with suspected Ebola Hemorrhagic fever died on May 6, 2011 in the Luwero district, Uganda. The quick diagnosis from a blood sample of Ebola virus was provided by the new CDC Viral Hemorrhagic Fever laboratory installed at the Uganda Viral Research Institute (UVRI). 30",1,100
+"6","2008","Democratic Republic of the Congo","Ebola virus",32,"Outbreak occurred in the Mweka and luebo health zones of the Province of Kasai Occidental. 29 ",15,47
+"7","2008","Philippines","Reston virus",0,"First known occurrence of Ebola-Reston in pigs. Strain closely similar to earlier strains. Six workers from the pig farm and slaughterhouse developed antibodies but did not become sick. 27 28 ",NA,0
+"8","2007","Uganda","Bundibugyo virus",149,"Outbreak occurred in Bundibugyo District in western Uganda. First reported occurance of a new strain. 26 ",37,25
+"9","2007","Democratic Republic of Congo","Ebola virus",264,"Outbreak occurred in Kasai Occidental Province. The outbreak was declared over November 20. Last confirmed case on October 4 and last death on October 10. 24 25 ",187,71
+"10","2004","Russia","Ebola virus",1,"Laboratory contamination. 23",1,100
+"11","2004","Sudan (South Sudan)","Sudan virus",17,"Outbreak occurred in Yambio county of southern Sudan. This outbreak was concurrent with an outbreak of measles in the same area, and several suspected EHF cases were later reclassified as measeles cases. 22 ",7,41
+"12","2003","Republic of Congo","Ebola virus",35,"Outbreak occured in Mbomo and Mbandza villages located in Mbomo distric, Cuvette Ouest Département. 21 ",29,83
+"13","2002","Republic of Congo","Ebola virus",143,"Outbreak occurred in the districts of Mbomo and Kéllé in Cuvette Ouest Département. 20 ",128,89
+"14","2001","Republic of Congo","Ebola virus",57,"Outbreak occurred over the border of Gabon and the Republic of the Congo. This was the first time that Ebola hemorrhagic fever was reported in the Republic of the Congo. 19 ",43,75
+"15","2001","Gabon","Ebola virus",65,"Outbreak occured over the border of Gabon and the Republic of the Congo. 19 ",53,82
+"16","2000","Uganda","Sudan virus",425,"Occurred in Gulu, Masindi, and Mbarara districts of Uganda. The three most important risks associated with Ebola virus infection were attending funerals of Ebola hemorrhagic fever case-patients, having contact with case-patients in one's family, and providing medical care to Ebola case-patients without using adequate personal protective measures. 18 ",224,53
+"17","1996","Russia","Ebola virus",1,"Laboratory contamination 17",1,100
+"18","1996","Philippines","Reston virus",0,"Ebola-Reston virus was identified in a mokey export facility in the Philippines. No human infections were identified. 16",NA,0
+"19","1996","USA","Reston virus",0,"Ebola-Reston virus was introduced into a quarantine facility in Texas by monkeys imported from the Philippines. No human infections were identified. 15",NA,0
+"20","1996","South Africa","Ebola virus",2,"A medical professional traveled from Gabon to Johannesburg, South Africa, after having treated Ebola virus-infected patients and thus having been exposed to the virus. He was hospitalized, and a nurse who took care of him became infected and died. 14",1,50
+"21","1996","Gabon","Ebola virus",60,"Occurred in Booué area with transport of patients to Libreville. Index case-patient was a hunter who lived in a forest camp. Disease was spread by close contact with infected persons. A dead chimpanzee found in the forest at the time was determined to be infected. 11",45,74
+"22","1996","Gabon","Ebola virus",37,"Occured in Mayibout area. A chimpanzee found dead in the forest was eaten by people hunting for food. Nineteen people who were involved in the butchery of the animal became ill; other cases occured in family members. 11",21,57
+"23","1995","Democratic Republic of the Congo (formerly Zaire)","Ebola virus",315,"Occured in Kikwit and surrounding area. Traced to index case-patient who worked in forest adjoining the city. Epidemic spread through families and hospitals. 13",250,81
+"24","1994","Côte d'Ivoire (Ivory Coast)","Taï Forest virus",1,"Scientist became ill after conducting an autopsy on a wild chimpanzee in the Tai Forest. The patient was treated in Switzerland. 12",NA,0
+"25","1994","Gabon","Ebola virus",52,"Occured in Mékouka and other gold-mining camps deep in the rain forest. Initially thought to be yellow fever; identified as Ebola hemorrhagic fever in 1995. 11",31,60
+"26","1992","Italy","Reston virus",0,"Ebola-Reston virus was introduced into quarantine facilities in Sienna by monkeys imported from the same export facility in the Philippines that was involved in the episodes in the United States. No humans were infected. 10",NA,0
+"27","1989","Philippines","Reston virus",0,"High mortality among cynomolgus macaques in a primate facility responsible for exporting animals in the USA. 8",NA,0
+"29","1990","USA","Reston virus",0,"Ebola-Reston virus was introduced once again into quarantine facilities in Virginia, and Texas by monkeys imported from the Philippines. Four humans developed antibodies but did not get sick. 7",NA,0
+"30","1989","USA","Reston virus",0,"Ebola-Reston virus was introduced into quarantine facilities in Virginia and Pennsylvania by monkeys imported from the Philippines. 6",NA,0
+"31","1979","Sudan (South Sudan)","Sudan virus",34,"Occured in Nzara, Maridi. Recurrent outbreak at the same site as the 1976 Sudan epidemic. 5",22,65
+"32","1977","Zaire","Ebola virus",1,"Noted retrospectively in the village of Tandala. 4",1,100
+"33","1976","England","Sudan virus",1,"Laboratory infection by accidental stick of contaminated needle. 3",NA,0
+"34","1976","Sudan (South Sudan)","Sudan virus",284,"Occurred in Nzara, Maridi and the surrounding area. Disease was spread mainly through close personal contact within hospitals. Many medical care personnel were infected. 2",151,53
+"35","1976","Zaire (Democratic Republic of the Congo - DRC)","Ebola virus",318,"Occurred in Yambuku and surrounding area. Disease was spread by close personal contact and by use of contaminated needles and syringes in hospitals/clinics. This outbreak was the first recognition of the disease. 1",280,88
+"341","2014","Guinea","NA",1472,"Countries with Widespread Transmission",843,0.572690217391304
+"351","2014","Liberia","NA",4249,"Countries with Widespread Transmission",2458,0.578489056248529
+"36","2014","Sierra Leone","NA",3252,"Countries with Widespread Transmission",1183,0.363776137761378
+"37","2014","Senegal","NA",1,"Countries with Travel-associated Cases",0,0
+"38","2014","Spain","NA",1,"Countries with Travel-associated Cases",0,0
+"39","2014","Nigeria","NA",20,"Countries with Localized Transmission",8,0.4
+"40","2014","United States","NA",3,"Countries with Localized Transmission",1,0.333333333333333
