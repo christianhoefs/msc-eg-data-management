@@ -1,0 +1,108 @@
+---
+title: "W12-1 Shiny visualizations"
+author: "Christian Höfs, Jonas Hagge und Stefan Pinkert"
+date: "3 Februar 2017"
+output: html_document
+runtime: shiny
+---
+
+
+```{r, warning=FALSE, message=FALSE}
+
+# Preamble
+library(shiny)
+library(sp)
+library(raster)
+library(rgdal)
+library(ggplot2)
+library(classInt)
+library(RColorBrewer)
+
+# working directories
+inpath_dm <- "E:/Dropbox/Dropbox/Dropbox/Data_managment/data/input"
+output_dm <- "E:/Dropbox/Dropbox/Dropbox//Data_managment/data/output"
+# lava flow from 2014 as defined by surface temperature
+b10 <- raster(file.path(inpath_dm,"LC82100502014328LGN00_B10.tif"))
+lava <- b10
+lava[lava < 15]<- NA
+# study sites from 2014
+fsd2014 <- readOGR(inpath_dm,"data_2014_subset1")
+fsd2014 <- spTransform(fsd2014,crs(b10))
+# generate 
+files <- list.files(path=file.path(inpath_dm), pattern = glob2rx("*.tif"), full.names = TRUE)
+fogo<-stack(files[6],files[5],files[4]) 
+fogo<-stretch(fogo,minv = 0 , maxv = 255)
+
+# load the required raster data form landsat 8 scene
+grayscale <- colorRampPalette(c("gray10","gray90"))(20)
+rainbow   <- colorRampPalette(c("#003391","#005FA8", "#3288BD", "#66C2A5", "#ABDDA4", 
+                              "#E6F598", "#FFFFBF", "#FEE08B", "#FDAE61", "#F46D43", "#D53E4F", "#9E0142","darkred")) (20)
+reds<-colorRampPalette(reds) (10); reds<-brewer.pal(9,"Reds"); blues<-colorRampPalette(blues) (10); blues<-rev(brewer.pal(9,"Blues"))
+bipolar   <- c(blues,reds)
+
+palette<-list(grayscale,rainbow,bipolar)
+names(palette)<-c("grayscale","rainbow","bipolar")
+
+xmin<-bbox(fogo[[2]])[1,1]
+xmax<-bbox(fogo[[2]])[1,2]
+ymin<-bbox(fogo[[2]])[2,1]
+ymax<-bbox(fogo[[2]])[2,2]
+
+# Define UI for application
+ui <- fluidPage(
+   
+   # Application title
+   titlePanel("BIS-Fogo project - Fogo island, Cape Verdes"),
+   
+   # Sidebar with three interactive inputs
+   sidebarLayout(
+      sidebarPanel(
+         # zoom in, i.e. define number of grid lines in percent (1 to 80)
+         sliderInput("p_zoom", "Zoom in %:",
+                     min = 1, max = 80, value = 15, step = 10),
+         # desplay only the n first study sites
+         sliderInput("n_studysites", "Number of Study sites (chronol. order):",
+                     min = 1, max = 161, value = 1, step = 10),
+         # select one of three palettes
+         selectInput(inputId = "palette_in", label= "Select colour palette:", choices=list("Grayscale"="grayscale","Rainbow colours"="rainbow",
+         "Bipolor color space - blue to red" = "bipolar"), selected = "bipolar", multiple = F, selectize = T, width = NULL, size = NULL)
+         ),
+      # Show a map of fogo
+      mainPanel(
+         plotOutput(outputId = "plot1")
+      )
+   )
+)
+
+# Define server logic required to draw a histogram
+server <- function(input, output) {
+     
+      output$plot1 <- renderPlot({
+           
+           # include all study site from 1 to n (interactive)
+           fsd2014<-fsd2014[1:input$n_studysites,]
+           
+           # mid coordinates, after dropping a certain percentage (interactive)
+           x_dis<-input$p_zoom/100*(xmax-xmin)
+           y_dis<-input$p_zoom/100*(ymax-ymin)
+           
+           # exclude this number of grid lines, start from the edges
+           fogo<-crop(fogo[[2]],extent(xmin+(x_dis/2),xmax-(x_dis/2),ymin+(y_dis/2),ymax-(y_dis/2)))
+           # same for lava
+           lava<-crop(lava,extent(xmin+(x_dis/2),xmax-(x_dis/2),ymin+(y_dis/2),ymax-(y_dis/2)))
+           
+           # select one (interactive) of the three different colour scale from a pre-defined palett object (there is probably a more elegant)
+           cols<-palette[input$palette_in][[1]]
+           
+           # plot all spatial objects into one plot window
+           plot(fogo, col=cols)
+           plot(lava, col="darkred", legend=FALSE, add=TRUE)
+           plot(fsd2014, col="pink", pch=3, add=TRUE, cex= 2)
+           
+   })
+}
+
+# Run the application 
+shinyApp(ui = ui, server = server)
+
+````

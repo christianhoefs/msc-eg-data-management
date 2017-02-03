@@ -1,0 +1,58 @@
+---
+title: "W02-01 CSV I/O and some simple modifications"
+output: html_document
+author: "Christian Höfs, Stefan Pinkert & Jonas Hagge"
+date: "22.Oktober 2015"
+
+---
+
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results="hide"}
+
+
+inpath_dm <- "E:/Dropbox/Dropbox/Dropbox/Data_managment/data/input/"
+output_dm <- "E:/Dropbox/Dropbox/Dropbox/Data_managment/data/output/"
+```
+
+
+
+```{r}
+#Natural Disasters Chronology
+
+#read .csv file
+
+nd <- read.csv(paste0(inpath_dm, "nd_1900_2014.csv"), sep = ",", header=TRUE)
+
+#watch the data frame´s structure and check if the reading has been successful by printing the first two (five) lines
+
+nd[1:2,]
+
+head(nd)
+
+#sum the collumn values of the collumns "affected", "injured" and "homeless" and write them into a new collumn "control_affected"
+
+nd$control_affected <-  nd$affected + nd$injured + nd$homeless
+
+#use "any" and a "!" to check if the collumn values are identical
+
+any(!nd$control_affected == nd$total_affected)
+
+
+#rename the collumn affected" to "other affected"
+
+colnames(nd)[colnames(nd) == "affected" ] <- "other_affected"
+
+#sort the data frame by continent and country
+
+nd_mod<- nd[order(nd[,"continent"], nd[,"country"]),] 
+
+#watch the structure again printing the first 5 lines with "head"
+head(nd_mod)
+
+#Write the modified data frame as .csv file
+
+write.csv(nd_mod, paste0(output_dm, "nd_1900_2014_mod.csv"))
+  
+```
+

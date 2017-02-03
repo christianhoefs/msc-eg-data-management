@@ -1,0 +1,142 @@
+---
+title: "W04-01 Summarizing a dataset"
+output: html_document
+author: "Christian Höfs, Stefan Pinkert & Jonas Hagge"
+date: "22.Oktober 2015"
+
+---
+
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results="hide"}
+
+
+inpath_dm <- "E:/Dropbox/Dropbox/Dropbox/Data_managment/data/input/"
+output_dm <- "E:/Dropbox/Dropbox/Dropbox/Data_managment/data/output/"
+```
+
+
+
+```{r}
+#Preparing a combined Ebola and Natural Disaster dataset
+
+# 1. Read the Ebola and Natural Disaster data in the environment
+
+ebola <- read.csv(paste0(inpath_dm, "ebola_gesamt.csv"))
+
+nd <- read.csv(paste0(inpath_dm, "nd_1900_2014_mod.csv"))
+
+#2. Ebola and Natural Disaster data
+
+
+ebola <-  data.frame(year = ebola$year,
+                 disaster.group = "Natural",
+                 disaster.subgroup = "Biological",
+                 disaster.type = "Ebola",
+                 disaster.subtype = "Ebola",
+                 country = ebola$country,
+                 deaths = ebola$absolute_death,
+                 total_affected = ebola$infected)
+nd <- nd[,c("year", "disaster.group", "disaster.subgroup", "disaster.type", "disaster.subtype", "country", "deaths", "total_affected")]
+
+    
+# Modify country names not compatible between the data sets
+    # The content of the Ebola data set is stored in data frame ebola.
+    ebola$country <- as.character(ebola$country)
+     
+    ebola$country[grepl(
+      paste("Zaire (Democratic Republic of the Congo - DRC)", 
+            "Zaire", 
+            "Democratic Republic of the Congo \\(formerly Zaire\\)", 
+            "Democratic Republic of Congo",
+            "Democratic Republic of the Congo", sep = "|"), 
+      ebola$country)] <- "Zaire/Congo Dem Rep"
+     
+    ebola$country[grepl("Republic of Congo",ebola$country)] <- "Congo"
+     
+    ebola$country[grepl("England",ebola$country)] <- "United Kingdom"
+     
+    ebola$country[grepl("USA",ebola$country)] <- "United States"
+     
+    ebola$country[grepl("Sudan \\(South Sudan\\)",ebola$country)] <- "South Sudan"
+     
+    ebola$country[grepl("Côte d'Ivoire \\(Ivory Coast\\)",ebola$country)] <- 
+      "Cote d'Ivoire"
+     
+    unique(ebola$country[!(ebola$country %in% nd$country)])
+
+ebola$deaths[is.na(ebola$deaths)] <- 0
+
+comb <- rbind(nd,ebola)
+
+
+
+#In the combined data set, delete all events of category disaster.subtype with ID "Viral Infectious Diseases" if they fall into an Ebola year and Ebola affected country   
+# The content of the combined data set is stored in data frame comb.
+    # Define a unique year/country key for the ebola events and use it for the 
+    # selection of all viral infectious diseases co-occuring to Ebola. By inverting
+    # the selection, the new data frame has no double entries.
+    comb <- comb[!(comb$disaster.subtype == "Viral Infectious Diseases" & 
+                     paste0(comb$year, comb$country) %in% 
+                     paste0(ebola$year, ebola$country)),]
+
+
+# 3. Print the following to the command line and replace <N>, <NN> etc. by the actual numbers (i.e. compute them first):
+
+#a   "On average, each Ebola outbreak leads to the deaths of 151 persons as compared to 274 for other natural disaster events in the countries affected by Ebola deaths."
+
+md_eo <- mean(comb[comb$disaster.type == "Ebola",]$deaths)
+print(md_eo)
+# Mean deaths of person for other natural disaster events in the countries affected by Ebola deaths
+md_nd <- mean(comb[!comb$disaster.type == "Ebola" & comb$country %in% unique(comb[comb$disaster.type == "Ebola",]$country),]$deaths)
+print(md_nd)
+
+print(paste("On average, each Ebola outbreak leads to the deaths of", round(md_eo, digits = 0), "persons as compared to", round(md_nd, digits = 0), "for other natural disaster events in the countries affected by Ebola deaths."))
+
+#b "On average, each Ebola outbreak directly affects 282 persons as compared to 118086 for other natural disaster events in the countries affected by Ebola events."
+
+
+ma_eo <- mean(comb[comb$disaster.type == "Ebola",]$total_affected)
+print(ma_eo)
+# Mean deaths of person for other natural disaster events in the countries affected by Ebola deaths
+ma_nd <- mean(comb[!comb$disaster.type == "Ebola" & comb$country %in% unique(comb[comb$disaster.type == "Ebola",]$country),]$total_affected)
+print(ma_nd)
+
+print(paste("On average, each Ebola outbreak directly affects", round(ma_eo, digits = 0), "persons as compared to", round(ma_nd, digits = 0), "for other natural disaster events in the countries affected by Ebola deaths."))
+
+
+##    c) "Ebola deaths rank on <N> of <NN> worldwide and on <NNN> of <NNNN> within countries directly affected by Ebola (level: disaster.subgroup)."
+##        Note: Since Ebola is classified in the "disaster.type" we use this column as raniking factor.
+
+# Adaped  case sensitivity of  the names  of  "disaster.type" 
+comb$disaster.type[grepl("Insect infestation", comb$disaster.type)] <- "Insect Infestation"
+comb$disaster.type[grepl("Mass movement wet", comb$disaster.type)] <- "Mass Movement Wet"
+comb$disaster.type[grepl("Mass movement dry", comb$disaster.type)] <- "Mass Movement Dry"
+comb$disaster.type[grepl("Transport accident", comb$disaster.type)] <- "Transport Accident"
+
+# Ranking of "disaster.type" worldwide
+dd_world <- aggregate(comb$deaths, by= list(comb$disaster.type), FUN=sum)
+rank_dd_world <- dd_world[order(dd_world$x, decreasing = TRUE),]
+n_rank_world  <- length(dd_world$x)
+ebola_rank_world  <- which(rank_dd_world$Group.1 == "Ebola")
+
+# Ranking of "disaster.type" within countries directly affected by Ebola
+country_ebola <- comb$country %in% unique(comb[comb$disaster.type == "Ebola",]$country)
+dd_country_ebola <- aggregate(comb[country_ebola,]$deaths, by= list(comb[country_ebola,]$disaster.type), FUN=sum)
+rank_country_ebola <- dd_country_ebola[order(dd_country_ebola$x, decreasing = TRUE),]
+n_rank_country_ebola  <- length(dd_country_ebola$x)
+ebola_rank_country_ebola  <- which(rank_country_ebola$Group.1 == "Ebola")
+             
+# Print results in a sentence
+print(paste("Ebola deaths rank on", ebola_rank_world, "of", n_rank_world, "worldwide and on", ebola_rank_country_ebola, "of", n_rank_country_ebola, "within countries directly affected by Ebola."))
+
+
+
+#d "The mean time span between two Ebola years is 2.1 years"
+
+
+mte <-mean(diff(sort(unique(comb[comb$disaster.type == "Ebola",]$year))))
+mte
+print(paste("The mean time span between two Ebola years is", round(mte, digits = 1),  "years."))
+
+```

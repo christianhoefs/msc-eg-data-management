@@ -1,0 +1,88 @@
+---
+title: 'W05-1: Melting a data set'
+author: "Christian HÃfÂ¶fs, Stefan Pinkert & Jonas Hagge"
+date: "28.Oktober 2015"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+
+
+```{r, echo=FALSE, warning=FALSE, message=FALSE, results="hide"}
+
+
+inpath_dm <- "E:/Dropbox/Dropbox/Dropbox/Data_managment/data/input/"
+output_dm <- "E:/Dropbox/Dropbox/Dropbox/Data_managment/data/output/"
+```
+ Part 1  -  Load and merge world bank data sets  Load world bank data sets by scanning files in a directory, convert them from wide to long format and combine both data sets by merging.
+
+```{r}
+
+
+file_list <- list.files(inpath_dm,
+                     pattern = glob2rx("wb*2013.csv"), 
+                     full.names = TRUE)
+
+wb <- lapply(file_list, 
+     function(i){
+     # Start of melt-structure
+     df <- read.table(i, header = TRUE, sep = ",",skip=2)
+     df <- df[1:(nrow(df)),]
+     Year<-lapply(5:ncol(df), # the fith column represents the first year documented
+     function(icol){
+     ldf <-data.frame(Country.Code=df$Country.Code,
+                      Country.Name=df$Country.Name,
+                      Amount=rep(paste(df[,icol])), # paste the content of the respective columns
+                      Year=icol+1955) #the first year was 1960
+          return(ldf)
+     })
+     Year<-do.call(rbind,Year) # bind 55 rows to 1 data.frame
+          return(Year)
+     # End of of melt-structure
+     })
+
+# merge by country and year to create long format
+wb_long <- merge(wb[[1]], wb[[2]][,-1], by = c("Country.Name","Year"), all=FALSE) 
+wb_long<-unique(wb_long)
+colnames(wb_long)[4]<-"CO2"
+colnames(wb_long)[5]<-"GNI"
+wb_long$Indicator.CO2.unit<-"CO2 emissions (kt)"
+wb_long$Indicator.GNI.unit<-"GNI per capita, Atlas method (current US$)"
+
+# read and merge country metadata to long format data.frame
+meta_country<-read.table(file.path(inpath_dm,"wb-db_co2em_1960-2013_meta_country.csv"), header = TRUE, sep = ",")
+wb_long <- merge(wb_long, meta_country[,-c(1,6)], by.x = "Country.Code", by.y="Country.Code")
+
+str(wb_long)
+
+````
+
+ Part 2  -  Correlation of CO2 emission and GNI at the country-level 
+
+```{r}
+# prepare objects
+# convert numerical factor to character to numeric, preventing false translation
+
+
+wb_long[,4]<-as.numeric(as.character(wb_long[,4]))
+wb_long[,5]<-as.numeric(as.character(wb_long[,5]))
+
+subset_cor<-unique(wb_long[,c(1,2,4,5)])
+
+cor<-as.data.frame(unique(subset_cor[,c(1,2)]))
+cor[,3]<-as.numeric("NA")
+names(cor)<-c("Country.Code","Country.name","Correlation")
+
+# country-level correlations
+for (i in 1:nrow(cor)){
+     cor[i,3]<-cor(subset_cor$CO2[which(subset_cor[,1]==cor[i,1])],
+                   subset_cor$GNI[which(subset_cor[,1]==cor[i,1])],
+                   method = "pearson", use = "pairwise.complete.obs")
+}
+
+str(cor)
+
+write.csv(wb_long,file.path(output_dm,"combined_worldbank_data_long.csv"))
+````
+
